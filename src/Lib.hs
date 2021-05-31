@@ -74,3 +74,12 @@ hierro numeroHierro habilidad
 
 palos = [putter,madera] ++ map hierro [1 .. 10]
 --Los hierros, que varían del 1 al 10 (número al que denominaremos n), generan un tiro de velocidad igual a la fuerza multiplicada por n, la precisión dividida por n y una altura de n-3 (con mínimo 0). Modelarlos de la forma más genérica posible.
+
+----------------------------------
+--Definir la función golpe que dados una persona y un palo, obtiene el tiro resultante de usar ese palo con las habilidades de la persona.
+--Por ejemplo si Bart usa un putter, se genera un tiro de velocidad = 10, precisión = 120 y altura = 0.
+golpe :: Palo -> Jugador -> Tiro
+golpe palo = palo . habilidad
+
+
+
