@@ -1,4 +1,5 @@
 module Lib where
+import Text.Show.Functions
 
 -- Modelo inicial
 
@@ -65,11 +66,11 @@ hierro numeroHierro habilidad
                              |between 1 10 numeroHierro = UnTiro {
                                velocidad = fuerzaJugador habilidad * numeroHierro,
                                precision = precisionJugador habilidad `div` numeroHierro,
-                               altura = alturaMinima numeroHierro
+                               altura = (numeroHierro-3) `max` 0
                              }
-alturaMinima numeroHierro 
-                         | numeroHierro <= 3 = 0
-                         | otherwise = numeroHierro - 3
+--alturaMinima numeroHierro 
+--                         | numeroHierro <= 3 = 0
+--                         | otherwise = numeroHierro - 3
 
-
+palos = [putter,madera] ++ map hierro [1 .. 10]
 --Los hierros, que varían del 1 al 10 (número al que denominaremos n), generan un tiro de velocidad igual a la fuerza multiplicada por n, la precisión dividida por n y una altura de n-3 (con mínimo 0). Modelarlos de la forma más genérica posible.
