@@ -101,8 +101,9 @@ hoyo :: Obstaculo
 hoyo palo jugador = (altura) (golpe palo jugador) == 0 && (between 5 20 (velocidad (golpe palo jugador))) 
 -}
 
-
+tiroQuieto :: Tiro -> Tiro
 tiroQuieto tiro= tiro {velocidad=0,precision=0,altura=0}
+alRazDelSuelo :: Tiro -> Tiro
 alRazDelSuelo tiro = (altura tiro) == 0 
 
 tunelConRampa :: Obstaculo
@@ -110,7 +111,10 @@ tunelConRampa tiro
                   |superaRampa tiro = efectoRampa tiro
                   |otherwise = tiroQuieto tiro
 
+efectoRampa :: Tiro -> Tiro
 efectoRampa tiro = tiro {velocidad=velocidad tiro *2,precision=100,altura=0}
+
+superaRampa :: Tiro -> Bool
 superaRampa tiro = precision tiro > 90 && alRazDelSuelo tiro
 
 
@@ -119,7 +123,9 @@ laguna largoLaguna tiro
                        |superaLaguna tiro = efectoLaguna largoLaguna tiro
                        |otherwise = tiroQuieto tiro
 
+efectoLaguna :: Int -> Tiro -> Tiro
 efectoLaguna largoLaguna tiro = tiro {altura= (altura tiro) `div` largoLaguna}
+superaLaguna :: Tiro -> Bool
 superaLaguna tiro = (velocidad tiro) > 80 && ((between 1 5.altura) tiro)
 
 
@@ -129,6 +135,7 @@ hoyo tiro
          |otherwise = tiroQuieto tiro
 efectoHoyo :: Tiro -> Tiro
 efectoHoyo = tiroQuieto
+superaHoyo :: Tiro -> Bool
 superaHoyo tiro = alRazDelSuelo tiro && ((between 5 20.velocidad) tiro) && (precision tiro) >95
 
 
