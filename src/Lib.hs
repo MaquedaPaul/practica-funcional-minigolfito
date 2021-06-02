@@ -81,5 +81,47 @@ palos = [putter,madera] ++ map hierro [1 .. 10]
 golpe :: Palo -> Jugador -> Tiro
 golpe palo = palo . habilidad
 
+------------------------------------------------
+--Lo que nos interesa de los distintos obstáculos es si un tiro puede superarlo, y en el caso de poder superarlo, cómo se ve afectado dicho tiro por el obstáculo. En principio necesitamos representar los siguientes obstáculos:
+--a)
+--type Obstaculo = Jugador -> Palo -> Tiro
+type Obstaculo = Tiro -> (Tiro,Bool)
+---
+-- ¿En qué fallé?
+--Pensé mal el Obstaculo, porque en realidad es Tiro -> Tiro
+{-
+tunelConRampa :: Obstaculo
+tunelConRampa jugador palo = (precision) (golpe palo jugador) > 90 && (altura) (golpe palo jugador) == 0
+  --(precision (golpe palo jugador)) > 90 && (altura (golpe palo jugador))
+--esSuperado tiro criterio1 criterio2 = tiro criterio1 && tiro criterio2
+laguna :: Obstaculo
+laguna palo jugador = (velocidad) (golpe palo jugador) > 90 && (between 1 5 (altura (golpe palo jugador))) 
+
+hoyo :: Obstaculo
+hoyo palo jugador = (altura) (golpe palo jugador) == 0 && (between 5 20 (velocidad (golpe palo jugador))) 
+-}
+
+
+tiroQuieto tiro= tiro {velocidad=0,precision=0,altura=0}
+
+tunelConRampa :: Obstaculo
+tunelConRampa tiro 
+                  |(precision tiro) > 90 && (altura tiro) == 0 = (tiro {
+velocidad= velocidad tiro *2,
+precision=100,
+altura=0},True)
+                  |otherwise = (tiroQuieto tiro,False)
+
+laguna :: Int->Obstaculo
+laguna largoLaguna tiro 
+                       |(velocidad tiro) > 80 && (between 1 5 (altura tiro)) = (tiro {
+altura= (altura tiro) `div` largoLaguna},True)
+                       |otherwise = (tiroQuieto tiro,False)
+
+
+hoyo :: Obstaculo
+hoyo tiro 
+         |(altura tiro) == 0 && (between 5 20 (velocidad tiro)) && (precision tiro) >95 = (tiroQuieto tiro,True)
+         |otherwise = (tiroQuieto tiro,False)
 
 
