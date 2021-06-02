@@ -85,7 +85,7 @@ golpe palo = palo . habilidad
 --Lo que nos interesa de los distintos obstáculos es si un tiro puede superarlo, y en el caso de poder superarlo, cómo se ve afectado dicho tiro por el obstáculo. En principio necesitamos representar los siguientes obstáculos:
 --a)
 --type Obstaculo = Jugador -> Palo -> Tiro
-type Obstaculo = Tiro -> Tiro
+type Obstaculo = Tiro -> (Tiro,Bool)
 ---
 -- ¿En qué fallé?
 --Pensé mal el Obstaculo, porque en realidad es Tiro -> Tiro
@@ -103,13 +103,15 @@ hoyo palo jugador = (altura) (golpe palo jugador) == 0 && (between 5 20 (velocid
 
 tiroQuieto :: Tiro -> Tiro
 tiroQuieto tiro= tiro {velocidad=0,precision=0,altura=0}
-alRazDelSuelo :: Tiro -> Tiro
+alRazDelSuelo :: Tiro -> Bool
 alRazDelSuelo tiro = (altura tiro) == 0 
 
+superaObstaculo condicion efecto tiro
+                                     |condicion tiro = (efecto tiro,True)
+                                     |otherwise = (tiroQuieto tiro,False)
+
 tunelConRampa :: Obstaculo
-tunelConRampa tiro 
-                  |superaRampa tiro = efectoRampa tiro
-                  |otherwise = tiroQuieto tiro
+tunelConRampa tiro = superaObstaculo superaRampa efectoRampa tiro
 
 efectoRampa :: Tiro -> Tiro
 efectoRampa tiro = tiro {velocidad=velocidad tiro *2,precision=100,altura=0}
@@ -117,27 +119,41 @@ efectoRampa tiro = tiro {velocidad=velocidad tiro *2,precision=100,altura=0}
 superaRampa :: Tiro -> Bool
 superaRampa tiro = precision tiro > 90 && alRazDelSuelo tiro
 
-
 laguna :: Int->Obstaculo
-laguna largoLaguna tiro 
-                       |superaLaguna tiro = efectoLaguna largoLaguna tiro
-                       |otherwise = tiroQuieto tiro
+laguna largoLaguna tiro = superaObstaculo superaLaguna (efectoLaguna largoLaguna) tiro
 
 efectoLaguna :: Int -> Tiro -> Tiro
 efectoLaguna largoLaguna tiro = tiro {altura= (altura tiro) `div` largoLaguna}
 superaLaguna :: Tiro -> Bool
 superaLaguna tiro = (velocidad tiro) > 80 && ((between 1 5.altura) tiro)
 
-
 hoyo :: Obstaculo
-hoyo tiro 
-         |superaHoyo tiro = efectoHoyo tiro
-         |otherwise = tiroQuieto tiro
+hoyo tiro = superaObstaculo superaHoyo efectoHoyo tiro
+
 efectoHoyo :: Tiro -> Tiro
 efectoHoyo = tiroQuieto
 superaHoyo :: Tiro -> Bool
-superaHoyo tiro = alRazDelSuelo tiro && ((between 5 20.velocidad) tiro) && (precision tiro) >95
+superaHoyo tiro = alRazDelSuelo tiro && ((between 5 20.velocidad) tiro) && (precision tiro) > 95
+
+--palosUtiles :: Jugador -> Obstaculo -> [Palo]
+palosUtiles jugador obstaculo = filter (leSirve jugador obstaculo) palos
 
 
+leSirve jugador obstaculo palo = snd.obstaculo $ (golpe palo jugador) 
 
+
+obstaculos1 = [tunelConRampa,tunelConRampa,hoyo]
+
+superaObstaculosConsecutivos :: Tiro -> [Obstaculo] -> Int
+superaObstaculosConsecutivos tiro [] = 0
+superaObstaculosConsecutivos tiro (obstaculo : obstaculos)
+  |esSuperado obstaculo tiro =
+     1 + superaObstaculosConsecutivos (efectoEnTiro obstaculo tiro) obstaculos
+  |otherwise = 0
+
+esSuperado :: Obstaculo -> Tiro -> Bool
+esSuperado obstaculo = snd.obstaculo
+
+efectoEnTiro :: Obstaculo -> Tiro -> Tiro
+efectoEnTiro obstaculo = fst.obstaculo
 
