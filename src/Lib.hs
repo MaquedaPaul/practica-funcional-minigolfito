@@ -164,7 +164,7 @@ efectoEnTiro obstaculo = fst.obstaculo
 
 paloMasUtil :: Jugador -> [Obstaculo] -> Palo
 
-paloMasUtil jugador obstaculos = maximoSegun ((flip superaObstaculosConsecutivos) obstaculos1 . flip golpe bart) palos
+paloMasUtil jugador obstaculos = maximoSegun ((flip superaObstaculosConsecutivos) obstaculos . flip golpe jugador) palos
 
 puntosDeCadaJugador :: [(Jugador,Int)]
 puntosDeCadaJugador = [(bart,30),(todd,28),(rafa,15)]
