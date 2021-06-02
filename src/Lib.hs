@@ -135,10 +135,13 @@ efectoHoyo = tiroQuieto
 superaHoyo :: Tiro -> Bool
 superaHoyo tiro = alRazDelSuelo tiro && ((between 5 20.velocidad) tiro) && (precision tiro) > 95
 
---palosUtiles :: Jugador -> Obstaculo -> [Palo]
+
+funcion palo jugador = golpe palo jugador 
+
+palosUtiles :: Jugador -> Obstaculo -> [Palo]
 palosUtiles jugador obstaculo = filter (leSirve jugador obstaculo) palos
 
-
+leSirve :: Jugador -> Obstaculo ->Palo -> Bool
 leSirve jugador obstaculo palo = snd.obstaculo $ (golpe palo jugador) 
 
 
@@ -157,3 +160,14 @@ esSuperado obstaculo = snd.obstaculo
 efectoEnTiro :: Obstaculo -> Tiro -> Tiro
 efectoEnTiro obstaculo = fst.obstaculo
 
+
+
+--paloMasUtil :: Jugador -> [Obstaculo] -> Palo
+--paloMasUtil jugador obstaculos = maximoSegun (superaObstaculosConsecutivos obstaculos ) palos
+
+
+
+--palosUtiles :: Jugador -> Obstaculo -> [Palo]
+--palosUtiles jugador obstaculo = filter (leSirve jugador obstaculo) palos
+--leSirve :: Jugador -> Obstaculo ->Palo -> Bool
+--filter ()
