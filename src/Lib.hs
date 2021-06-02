@@ -142,10 +142,10 @@ palosUtiles :: Jugador -> Obstaculo -> [Palo]
 palosUtiles jugador obstaculo = filter (leSirve jugador obstaculo) palos
 
 leSirve :: Jugador -> Obstaculo ->Palo -> Bool
-leSirve jugador obstaculo palo = snd.obstaculo $ (golpe palo jugador) 
+leSirve jugador obstaculo palo = esSuperado obstaculo $ (golpe palo jugador) 
 
 
-obstaculos1 = [tunelConRampa,tunelConRampa,hoyo]
+obstaculos1 = [(laguna 4),(laguna 5),tunelConRampa,hoyo]
 
 superaObstaculosConsecutivos :: Tiro -> [Obstaculo] -> Int
 superaObstaculosConsecutivos tiro [] = 0
@@ -162,12 +162,31 @@ efectoEnTiro obstaculo = fst.obstaculo
 
 
 
---paloMasUtil :: Jugador -> [Obstaculo] -> Palo
---paloMasUtil jugador obstaculos = maximoSegun (superaObstaculosConsecutivos obstaculos ) palos
+paloMasUtil :: Jugador -> [Obstaculo] -> Palo
 
+paloMasUtil jugador obstaculos = maximoSegun ((flip superaObstaculosConsecutivos) obstaculos1 . flip golpe bart) palos
 
+puntosDeCadaJugador :: [(Jugador,Int)]
+puntosDeCadaJugador = [(bart,30),(todd,28),(rafa,15)]
+
+padresQuePierden listaPuntajes = map padre (jugadoresSinPuntaje (filter (jugadoresQuePierden listaPuntajes) listaPuntajes))
+
+jugadoresQuePierden listaPuntajes = not . flip ganoTorneo listaPuntajes
+
+jugadoresSinPuntaje listaPuntajes = map fst listaPuntajes
+
+ganoTorneo :: (Jugador,Int) -> [(Jugador,Int)] -> Bool
+ganoTorneo (jugador,puntaje) listaPuntajes = snd(maximoSegun (snd) listaPuntajes) <= puntaje
+
+--bart = UnJugador "Bart" "Homero" (Habilidad 25 60)
+--todd = UnJugador "Todd" "Ned" (Habilidad 15 80)
+--rafa = UnJugador "Rafa" "Gorgory" (Habilidad 10 1)
 
 --palosUtiles :: Jugador -> Obstaculo -> [Palo]
 --palosUtiles jugador obstaculo = filter (leSirve jugador obstaculo) palos
 --leSirve :: Jugador -> Obstaculo ->Palo -> Bool
 --filter ()
+
+
+
+
