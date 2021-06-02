@@ -85,7 +85,7 @@ golpe palo = palo . habilidad
 --Lo que nos interesa de los distintos obstáculos es si un tiro puede superarlo, y en el caso de poder superarlo, cómo se ve afectado dicho tiro por el obstáculo. En principio necesitamos representar los siguientes obstáculos:
 --a)
 --type Obstaculo = Jugador -> Palo -> Tiro
-type Obstaculo = Tiro -> (Tiro,Bool)
+type Obstaculo = Tiro -> Tiro
 ---
 -- ¿En qué fallé?
 --Pensé mal el Obstaculo, porque en realidad es Tiro -> Tiro
@@ -103,25 +103,34 @@ hoyo palo jugador = (altura) (golpe palo jugador) == 0 && (between 5 20 (velocid
 
 
 tiroQuieto tiro= tiro {velocidad=0,precision=0,altura=0}
+alRazDelSuelo tiro = (altura tiro) == 0 
 
 tunelConRampa :: Obstaculo
 tunelConRampa tiro 
-                  |(precision tiro) > 90 && (altura tiro) == 0 = (tiro {
-velocidad= velocidad tiro *2,
-precision=100,
-altura=0},True)
-                  |otherwise = (tiroQuieto tiro,False)
+                  |superaRampa tiro = efectoRampa tiro
+                  |otherwise = tiroQuieto tiro
+
+efectoRampa tiro = tiro {velocidad=velocidad tiro *2,precision=100,altura=0}
+superaRampa tiro = precision tiro > 90 && alRazDelSuelo tiro
+
 
 laguna :: Int->Obstaculo
 laguna largoLaguna tiro 
-                       |(velocidad tiro) > 80 && (between 1 5 (altura tiro)) = (tiro {
-altura= (altura tiro) `div` largoLaguna},True)
-                       |otherwise = (tiroQuieto tiro,False)
+                       |superaLaguna tiro = efectoLaguna largoLaguna tiro
+                       |otherwise = tiroQuieto tiro
+
+efectoLaguna largoLaguna tiro = tiro {altura= (altura tiro) `div` largoLaguna}
+superaLaguna tiro = (velocidad tiro) > 80 && ((between 1 5.altura) tiro)
 
 
 hoyo :: Obstaculo
 hoyo tiro 
-         |(altura tiro) == 0 && (between 5 20 (velocidad tiro)) && (precision tiro) >95 = (tiroQuieto tiro,True)
-         |otherwise = (tiroQuieto tiro,False)
+         |superaHoyo tiro = efectoHoyo tiro
+         |otherwise = tiroQuieto tiro
+efectoHoyo :: Tiro -> Tiro
+efectoHoyo = tiroQuieto
+superaHoyo tiro = alRazDelSuelo tiro && ((between 5 20.velocidad) tiro) && (precision tiro) >95
+
+
 
 
